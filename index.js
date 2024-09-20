@@ -81,9 +81,11 @@ function getLearnerData(course, ag, submissions) {
   const result = [];
   let learnerSubmissions;
   try {
-    learnerSubmissions = processSubmissions(ag, submissions);
+    learnerSubmissions = processSubmissions(course, ag, submissions);
   } catch (error) {
+    console.dir(error);
     console.log('Process submissions error!');
+    return result;
   }
 
   for (learner of learnerSubmissions) {
@@ -159,6 +161,7 @@ console.log(result);
 
 /**
  * process individual learner submission into an array of submissions connected with assignment object.
+ * @param {*} course obj
  * @param {*} ag assignment group
  * @param {*} submissions learner submission
  * @returns learner object with submissions connected with assignment
@@ -176,7 +179,10 @@ console.log(result);
  *    ]
  * ]
  */
-function processSubmissions(ag, submissions) {
+function processSubmissions(course, ag, submissions) {
+  if (typeof course !== 'object') {
+    throw new Error('Course data is not an object.');
+  }
   if (typeof ag !== 'object') {
     throw new Error('AssignmentGroup is not valid');
   } else {
@@ -188,6 +194,9 @@ function processSubmissions(ag, submissions) {
         return [];
       }
     }
+  }
+  if (course.id !== ag.course_id) {
+    throw new Error('Mismatched assignment group with course.');
   }
   if (!submissions instanceof Array) {
     throw new Error('Submissions is not valid array');
